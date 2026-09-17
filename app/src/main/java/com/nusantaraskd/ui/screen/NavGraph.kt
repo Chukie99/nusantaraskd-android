@@ -4,18 +4,22 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.nusantaraskd.data.repository.QuestionRepository
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(questionRepository: QuestionRepository) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "splash") {
         composable("splash") {
-            SplashScreen(onNavigateNext = {
-                navController.navigate("activation") {
-                    popUpTo("splash") { inclusive = true }
+            SplashScreen(
+                questionRepository = questionRepository,
+                onNavigateNext = {
+                    navController.navigate("activation") {
+                        popUpTo("splash") { inclusive = true }
+                    }
                 }
-            })
+            )
         }
         composable("activation") {
             ActivationScreen(onActivated = {

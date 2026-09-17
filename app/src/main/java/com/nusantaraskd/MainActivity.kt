@@ -1,4 +1,4 @@
-package com.nusantaraskd.app
+package com.nusantaraskd
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
