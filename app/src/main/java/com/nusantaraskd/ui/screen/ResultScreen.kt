@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ResultScreen(onHome: () -> Unit) {
+fun ResultScreen(score: Int, twk: Int, tiu: Int, tkp: Int, passed: Boolean, onHome: () -> Unit) {
     Scaffold(
         topBar = { TopAppBar(title = { Text("Hasil Simulasi") }) }
     ) { padding ->
@@ -21,19 +21,24 @@ fun ResultScreen(onHome: () -> Unit) {
             Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
                 Column(modifier = Modifier.padding(24.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("SKOR TOTAL", color = Color.Gray)
-                    Text("372", fontSize = 48.sp, fontWeight = FontWeight.Bold, color = Color(0xFF5C8D89))
+                    Text("$score", fontSize = 48.sp, fontWeight = FontWeight.Bold, color = Color(0xFF5C8D89))
                     Spacer(modifier = Modifier.height(8.dp))
-                    Surface(color = Color(0xFFA8E6CF), shape = RoundedCornerShape(8.dp)) {
-                        Text("MEMENUHI PASSING GRADE", modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), fontWeight = FontWeight.Bold, color = Color(0xFF155724))
+                    Surface(color = if (passed) Color(0xFFA8E6CF) else Color(0xFFFFD3D3), shape = RoundedCornerShape(8.dp)) {
+                        Text(
+                            if (passed) "MEMENUHI PASSING GRADE" else "BELUM LULUS",
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            fontWeight = FontWeight.Bold,
+                            color = if (passed) Color(0xFF155724) else Color(0xFF721C24)
+                        )
                     }
                 }
             }
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Breakdown Skor", fontWeight = FontWeight.Bold)
-                    Text("TWK: 105 (Passing Grade: 65)")
-                    Text("TIU: 115 (Passing Grade: 80)")
-                    Text("TKP: 152 (Passing Grade: 166)")
+                    Text("TWK: $twk (Passing Grade: 65) - ${if (twk >= 65) "Lulus" else "Tidak Lulus"}")
+                    Text("TIU: $tiu (Passing Grade: 80) - ${if (tiu >= 80) "Lulus" else "Tidak Lulus"}")
+                    Text("TKP: $tkp (Passing Grade: 166) - ${if (tkp >= 166) "Lulus" else "Tidak Lulus"}")
                 }
             }
             Spacer(modifier = Modifier.weight(1f))

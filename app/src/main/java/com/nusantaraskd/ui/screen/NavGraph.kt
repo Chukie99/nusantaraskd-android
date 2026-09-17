@@ -4,10 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.nusantaraskd.data.repository.QuestionRepository
 
 @Composable
-fun AppNavigation(questionRepository: QuestionRepository) {
+fun AppNavigation() {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "splash") {
@@ -53,11 +52,21 @@ fun AppNavigation(questionRepository: QuestionRepository) {
         }
         composable("exam") {
             ExamScreen(
-                onFinish = { navController.navigate("result") { popUpTo("home") } }
+                onFinish = { score, twk, tiu, tkp, passed ->
+                    navController.navigate("result/$score/$twk/$tiu/$tkp/$passed") {
+                        popUpTo("home")
+                    }
+                }
             )
         }
-        composable("result") {
+        composable("result/{score}/{twk}/{tiu}/{tkp}/{passed}") { backStackEntry ->
+            val score = backStackEntry.arguments?.getString("score")?.toInt() ?: 0
+            val twk = backStackEntry.arguments?.getString("twk")?.toInt() ?: 0
+            val tiu = backStackEntry.arguments?.getString("tiu")?.toInt() ?: 0
+            val tkp = backStackEntry.arguments?.getString("tkp")?.toInt() ?: 0
+            val passed = backStackEntry.arguments?.getString("passed")?.toBoolean() ?: false
             ResultScreen(
+                score = score, twk = twk, tiu = tiu, tkp = tkp, passed = passed,
                 onHome = { navController.navigate("home") { popUpTo("home") { inclusive = true } } }
             )
         }
