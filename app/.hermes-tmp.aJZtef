@@ -1,0 +1,22 @@
+{
+  "project_info": {
+    "project_number": "1234567890",
+    "project_id": "nusantaraskd-12345",
+    "storage_bucket": "nusantaraskd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1234567890:android:abc123def456",
+        "android_client_info": {
+          "package_name": "com.nusantaraskd.app"
+        }
+      },
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-1234567890abcdef"
+        }
+      ]
+    }
+  ]
+}
