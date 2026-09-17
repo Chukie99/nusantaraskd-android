@@ -1,30 +1,39 @@
 package com.nusantaraskd.ui.screen
 
 import androidx.compose.runtime.Composable
-import androidx.compose.material3.Text
-import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+
     NavHost(navController = navController, startDestination = "splash") {
         composable("splash") {
-            SplashScreen { navController.navigate("activation") }
+            SplashScreen(onNavigateNext = {
+                navController.navigate("activation") {
+                    popUpTo("splash") { inclusive = true }
+                }
+            })
         }
-        composable("activation") { ActivationScreen { navController.navigate("home") } }
-        composable("home") { HomeScreen() }
+        composable("activation") {
+            ActivationScreen(onActivated = {
+                navController.navigate("home") {
+                    popUpTo("activation") { inclusive = true }
+                }
+            })
+        }
+        composable("home") {
+            HomeScreen(
+                onStartExam = { navController.navigate("exam") },
+                onNavigateMenu = { route -> navController.navigate(route) }
+            )
+        }
+        composable("exam") { PlaceholderScreen("Simulasi CAT SKD") { navController.popBackStack() } }
+        composable("practice") { PlaceholderScreen("Mode Latihan") { navController.popBackStack() } }
+        composable("weakness") { PlaceholderScreen("Bank Soal Salah") { navController.popBackStack() } }
+        composable("stats") { PlaceholderScreen("Analisis Skor") { navController.popBackStack() } }
+        composable("history") { PlaceholderScreen("Riwayat Ujian") { navController.popBackStack() } }
     }
-}
-
-@Composable
-fun ActivationScreen(onComplete: () -> Unit) {
-    Text("Activation Screen")
-}
-
-@Composable
-fun HomeScreen() {
-    Text("Home Screen")
 }
