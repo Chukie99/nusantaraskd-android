@@ -14,8 +14,14 @@ data class QuestionEntity(
     val optionC: String,
     val optionD: String,
     val optionE: String,
-    val correctAnswer: String, // A, B, C, D, E
-    val weight: Int = 5, // For TKP scoring (1-5), TWK/TIU (0 or 5)
+    // Untuk TWK/TIU: cuma satu yang 5, lainnya 0
+    // Untuk TKP: semua opsi punya bobot 1-5 (variasi)
+    val weightA: Int = 0,
+    val weightB: Int = 0,
+    val weightC: Int = 0,
+    val weightD: Int = 0,
+    val weightE: Int = 0,
+    val correctAnswer: String = "", // Kosong untuk TKP
     val explanation: String
 )
 
