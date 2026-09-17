@@ -14,19 +14,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-import android.util.Log
-import com.nusantaraskd.data.repository.QuestionRepository
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun SplashScreen(
     onNavigateNext: () -> Unit,
-    questionRepository: QuestionRepository
+    viewModel: SplashViewModel = viewModel()
 ) {
     LaunchedEffect(key1 = true) {
+        viewModel.initializeDatabase()
         delay(2000)
-        questionRepository.seedIfEmpty()
-        val count = questionRepository.getQuestionCount()
-        Log.d("DB", "Total soal: $count")
         onNavigateNext()
     }
 

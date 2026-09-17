@@ -13,7 +13,6 @@ fun AppNavigation(questionRepository: QuestionRepository) {
     NavHost(navController = navController, startDestination = "splash") {
         composable("splash") {
             SplashScreen(
-                questionRepository = questionRepository,
                 onNavigateNext = {
                     navController.navigate("activation") {
                         popUpTo("splash") { inclusive = true }
