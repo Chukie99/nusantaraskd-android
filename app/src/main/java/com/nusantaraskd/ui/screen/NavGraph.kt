@@ -4,8 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
 
 @Composable
 fun AppNavGraph() {
@@ -14,14 +12,13 @@ fun AppNavGraph() {
     NavHost(navController = navController, startDestination = "home") {
         composable("home") {
             HomeScreen(
-                onNavigate = { route -> navController.navigate(route) },
-                onExit = { /* handle exit */ }
+                onStartExam = { navController.navigate("exam") },
+                onNavigateMenu = { route -> navController.navigate(route) }
             )
         }
         composable("exam") {
             ExamScreen(
-                onFinish = { total, twk, tiu, tkp, passed ->
-                    // After exam, return to home
+                onFinish = { _, _, _, _, _ ->
                     navController.navigate("home") {
                         popUpTo("exam") { inclusive = true }
                     }
