@@ -1,26 +1,25 @@
 package com.nusantaraskd.di
 
-import com.nusantaraskd.data.local.dao.*
 import com.nusantaraskd.data.repository.*
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object RepositoryModule {
+abstract class RepositoryModule {
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideQuestionRepository(questionDao: QuestionDao): QuestionRepository = QuestionRepositoryImpl(questionDao)
+    abstract fun bindQuestionRepository(impl: QuestionRepositoryImpl): QuestionRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideExamRepository(examSessionDao: ExamSessionDao, userAnswerDao: UserAnswerDao): ExamRepository = ExamRepositoryImpl(examSessionDao, userAnswerDao)
+    abstract fun bindExamRepository(impl: ExamRepositoryImpl): ExamRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideAppStateRepository(appStateDao: AppStateDao): AppStateRepository = AppStateRepositoryImpl(appStateDao)
+    abstract fun bindAppStateRepository(impl: AppStateRepositoryImpl): AppStateRepository
 }

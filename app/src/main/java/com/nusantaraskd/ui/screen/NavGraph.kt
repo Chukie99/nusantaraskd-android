@@ -29,11 +29,38 @@ fun AppNavigation(questionRepository: QuestionRepository) {
         }
         composable("home") {
             HomeScreen(
-                onStartExam = { navController.navigate("exam") },
-                onNavigateMenu = { route -> navController.navigate(route) }
+                onStartExam = { navController.navigate("pilih_paket") },
+                onNavigateMenu = { route ->
+                    if (route == "practice") {
+                        navController.navigate("pilih_paket")
+                    } else {
+                        navController.navigate(route)
+                    }
+                }
             )
         }
-        composable("exam") { PlaceholderScreen("Simulasi CAT SKD") { navController.popBackStack() } }
+        composable("pilih_paket") {
+            PilihPaketScreen(
+                onBack = { navController.popBackStack() },
+                onSelect = { _ -> navController.navigate("exam_instruction") }
+            )
+        }
+        composable("exam_instruction") {
+            ExamInstructionScreen(
+                onStart = { navController.navigate("exam") { popUpTo("home") } },
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable("exam") {
+            ExamScreen(
+                onFinish = { navController.navigate("result") { popUpTo("home") } }
+            )
+        }
+        composable("result") {
+            ResultScreen(
+                onHome = { navController.navigate("home") { popUpTo("home") { inclusive = true } } }
+            )
+        }
         composable("practice") { PlaceholderScreen("Mode Latihan") { navController.popBackStack() } }
         composable("weakness") { PlaceholderScreen("Bank Soal Salah") { navController.popBackStack() } }
         composable("stats") { PlaceholderScreen("Analisis Skor") { navController.popBackStack() } }
