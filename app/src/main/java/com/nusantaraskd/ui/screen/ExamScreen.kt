@@ -1,5 +1,6 @@
 package com.nusantaraskd.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,15 +19,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExamScreen(
-    viewModel: ExamViewModel = viewModel(),
+    viewModel: ExamViewModel = hiltViewModel(),
     onFinish: (Int, Int, Int, Int, Boolean) -> Unit
 ) {
     val questions by viewModel.questions.collectAsState()
+    Log.d("EXAM_SCREEN", "ExamScreen composed, questions: ${questions.size}")
     val currentIndex by viewModel.currentIndex.collectAsState()
     val answers by viewModel.answers.collectAsState()
     val markedQuestions by viewModel.markedQuestions.collectAsState()
@@ -44,9 +46,12 @@ fun ExamScreen(
     val timeFormatted = String.format("%02d:%02d:%02d", hours, minutes, seconds)
     val isWarning = timeRemaining < 300
 
+    var submitted by remember { mutableStateOf(false) }
+
     // Auto submit on zero
     LaunchedEffect(timeRemaining) {
-        if (timeRemaining <= 0 && questions.isNotEmpty()) {
+        if (timeRemaining <= 0 && !submitted && questions.isNotEmpty()) {
+            submitted = true
             val res = viewModel.calculateResults()
             onFinish(res.totalScore, res.twkScore, res.tiuScore, res.tkpScore, res.passed)
         }
