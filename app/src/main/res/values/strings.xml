@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Nusantara SKD</string>
+    <color name="primary">#5C8D89</color>
+    <color name="accent">#F4D06F</color>
+    <color name="background">#FDFBF7</color>
+</resources>
