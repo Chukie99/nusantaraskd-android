@@ -2,6 +2,12 @@ package com.nusantaraskd.data.repository
 
 import com.nusantaraskd.data.local.entity.ExamSessionEntity
 import com.nusantaraskd.data.local.entity.UserAnswerEntity
+import kotlinx.coroutines.flow.Flow
 
-// Keep this file only for the interface definition if needed, 
-// or remove if redundant (but Repositories.kt has it)
+interface ExamRepository {
+    suspend fun saveSession(session: ExamSessionEntity, answers: List<UserAnswerEntity>): Long
+    fun getAllSessionsFlow(): Flow<List<ExamSessionEntity>>
+    suspend fun getAllSessions(): List<ExamSessionEntity>
+    suspend fun getLatestSession(): ExamSessionEntity?
+    suspend fun getSessionById(id: Long): ExamSessionEntity?
+}

@@ -2,6 +2,7 @@ package com.nusantaraskd.data.repository
 
 import com.nusantaraskd.data.local.dao.*
 import com.nusantaraskd.data.local.entity.*
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -36,13 +37,6 @@ class QuestionRepositoryImpl @Inject constructor(
     }
 }
 
-interface ExamRepository {
-    suspend fun saveSession(session: ExamSessionEntity, answers: List<UserAnswerEntity>): Long
-    suspend fun getAllSessions(): List<ExamSessionEntity>
-    suspend fun getLatestSession(): ExamSessionEntity?
-    suspend fun getSessionById(id: Long): ExamSessionEntity?
-}
-
 @Singleton
 class ExamRepositoryImpl @Inject constructor(
     private val examSessionDao: ExamSessionDao,
@@ -54,6 +48,7 @@ class ExamRepositoryImpl @Inject constructor(
         userAnswerDao.insertAll(updatedAnswers)
         return sessionId
     }
+    override fun getAllSessionsFlow(): Flow<List<ExamSessionEntity>> = examSessionDao.getAllFlow()
     override suspend fun getAllSessions(): List<ExamSessionEntity> = examSessionDao.getAll()
     override suspend fun getLatestSession(): ExamSessionEntity? = examSessionDao.getLatest()
     override suspend fun getSessionById(id: Long): ExamSessionEntity? = examSessionDao.getById(id)

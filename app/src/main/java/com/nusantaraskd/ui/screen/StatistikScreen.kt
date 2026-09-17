@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -14,15 +14,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewModelScope
 import com.nusantaraskd.data.local.entity.ExamSessionEntity
 import com.nusantaraskd.data.repository.ExamRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
@@ -30,13 +30,12 @@ import javax.inject.Inject
 class StatsViewModel @Inject constructor(
     private val examRepository: ExamRepository
 ) : ViewModel() {
-    val sessions: StateFlow<List<ExamSessionEntity>> = flow {
-        emit(examRepository.getAllSessions())
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = emptyList()
-    )
+    val sessions: StateFlow<List<ExamSessionEntity>> = examRepository.getAllSessionsFlow()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 }
 
 data class StatsData(
@@ -52,9 +51,9 @@ data class StatsData(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatistikScreen(
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    viewModel: StatsViewModel = hiltViewModel()
 ) {
-    val viewModel = androidx.lifecycle.viewmodel.compose.viewModel<StatsViewModel>()
     val sessions by viewModel.sessions.collectAsStateWithLifecycle()
     
     val stats = if (sessions.isEmpty()) {
@@ -74,7 +73,7 @@ fun StatistikScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Statistik Skor") },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, null) } }
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) } }
             )
         }
     ) { padding ->
