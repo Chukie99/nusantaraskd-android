@@ -34,7 +34,7 @@ interface QuestionDao {
 @Dao
 interface ExamSessionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(session: ExamSessionEntity)
+    suspend fun insert(session: ExamSessionEntity): Long
 
     @Update
     suspend fun update(session: ExamSessionEntity)

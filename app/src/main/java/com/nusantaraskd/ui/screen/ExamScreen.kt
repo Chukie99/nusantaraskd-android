@@ -20,6 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -151,8 +154,11 @@ fun ExamScreen(
                             if (currentIndex < questions.size - 1) {
                                 viewModel.nextQuestion()
                             } else {
-                                val res = viewModel.calculateResults()
-                                onFinish(res.totalScore, res.twkScore, res.tiuScore, res.tkpScore, res.passed)
+                                val scope = CoroutineScope(Dispatchers.Main)
+                                scope.launch {
+                                    val res = viewModel.calculateResults()
+                                    onFinish(res.totalScore, res.twkScore, res.tiuScore, res.tkpScore, res.passed)
+                                }
                             }
                         },
                         modifier = Modifier.weight(1f)

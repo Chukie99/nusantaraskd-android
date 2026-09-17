@@ -30,21 +30,18 @@ fun AppNavigation() {
             HomeScreen(
                 onStartExam = { navController.navigate("pilih_paket") },
                 onNavigateMenu = { route ->
-                    if (route == "practice") {
-                        navController.navigate("pilih_paket")
-                    } else {
-                        navController.navigate(route)
-                    }
+                    navController.navigate(route)
                 }
             )
         }
         composable("pilih_paket") {
             PilihPaketScreen(
                 onBack = { navController.popBackStack() },
-                onSelect = { _ -> navController.navigate("exam_instruction") }
+                onSelect = { category -> navController.navigate("exam_instruction/$category") }
             )
         }
-        composable("exam_instruction") {
+        composable("exam_instruction/{category}") { backStackEntry ->
+            val category = backStackEntry.arguments?.getString("category") ?: "Simulasi"
             ExamInstructionScreen(
                 onStart = { navController.navigate("exam") { popUpTo("home") } },
                 onBack = { navController.popBackStack() }
@@ -70,9 +67,7 @@ fun AppNavigation() {
                 onHome = { navController.navigate("home") { popUpTo("home") { inclusive = true } } }
             )
         }
-        composable("practice") { PlaceholderScreen("Mode Latihan") { navController.popBackStack() } }
-        composable("weakness") { PlaceholderScreen("Bank Soal Salah") { navController.popBackStack() } }
-        composable("stats") { PlaceholderScreen("Analisis Skor") { navController.popBackStack() } }
-        composable("history") { PlaceholderScreen("Riwayat Ujian") { navController.popBackStack() } }
+        composable("history") { RiwayatScreen(onBack = { navController.popBackStack() }) }
+        composable("stats") { StatistikScreen(onBack = { navController.popBackStack() }) }
     }
 }

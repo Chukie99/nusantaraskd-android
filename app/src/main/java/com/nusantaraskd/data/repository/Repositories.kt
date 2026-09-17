@@ -29,7 +29,7 @@ class QuestionRepositoryImpl @Inject constructor(
                 QuestionEntity(category = "TWK", subCategory = "UUD 1945", questionText = "Pasal 1 ayat (1) UUD 1945 menyatakan bahwa Negara Indonesia adalah negara...", optionA = "Hukum", optionB = "Demokrasi", optionC = "Kesatuan", optionD = "Republik", optionE = "Pancasila", weightA = 0, weightB = 0, weightC = 5, weightD = 0, weightE = 0, correctAnswer = "C", explanation = "Berdasarkan Pasal 1 ayat (1), Negara Indonesia adalah negara kesatuan yang berbentuk republik."),
                 QuestionEntity(category = "TWK", subCategory = "Sejarah", questionText = "Sumpah Pemuda dibacakan pada tanggal...", optionA = "20 Mei 1908", optionB = "28 Oktober 1928", optionC = "17 Agustus 1945", optionD = "1 Juni 1945", optionE = "10 November 1945", weightA = 0, weightB = 5, weightC = 0, weightD = 0, weightE = 0, correctAnswer = "B", explanation = "Kongres Pemuda II melahirkan keputusan Sumpah Pemuda pada 28 Oktober 1928."),
                 QuestionEntity(category = "TIU", subCategory = "Verbal", questionText = "Sinonim kata EKLEKTIK adalah...", optionA = "Campuran", optionB = "Murni", optionC = "Tetap", optionD = "Tunggal", optionE = "Satu", weightA = 5, weightB = 0, weightC = 0, weightD = 0, weightE = 0, correctAnswer = "A", explanation = "Eklektik berarti memilih yang terbaik dari berbagai sumber."),
-                QuestionEntity(category = "TKP", subCategory = "Pelayanan Publik", questionText = "Anda adalah seorang pegawai loket pelayanan. Seorang tamu datang dengan marah-marah karena antrean terlalu panjang. Sikap Anda...", optionA = "Memarahi balik tamu tersebut", optionB = "Mendengarkan dengan sabar dan memberikan solusi terbaik", optionC = "Mengabaikannya sampai ia tenang", optionD = "Menyuruhnya pindah ke loket lain", optionE = "Melaporkannya kepada satpam", weightA = 1, weightB = 5, weightC = 2, weightD = 3, weightE = 4, correctAnswer = "", explanation = "Sebagai pelayan publik, kita harus sabar, empati, dan profesional dalam memberikan solusi.")
+                QuestionEntity(category = "TKP", subCategory = "Pelayanan Publik", questionText = "Anda adalah seorang pegawai loket pelayanan. Seorang tamu datang dengan marah-marah karena antrean terlalu panjang. Sikap Anda...", optionA = "Memarahi balik tamu tersebut", optionB = "Mendengarkan dengan sabar dan memberikan solusi terbaik", optionC = "Mengabaikannya sampai ia tenang", optionD = "Menyuruhnya pindah ke loket lain", optionE = "Melaporkannya kepada satpam", weightA = 1, weightB = 5, weightC = 2, weightD = 3, weightE = 4, correctAnswer = "", explanation = "As a public servant, we must be patient and helpful.")
             )
             questionDao.insertAll(dummyQuestions)
         }
@@ -37,9 +37,10 @@ class QuestionRepositoryImpl @Inject constructor(
 }
 
 interface ExamRepository {
-    suspend fun saveSession(session: ExamSessionEntity, answers: List<UserAnswerEntity>)
+    suspend fun saveSession(session: ExamSessionEntity, answers: List<UserAnswerEntity>): Long
     suspend fun getAllSessions(): List<ExamSessionEntity>
     suspend fun getLatestSession(): ExamSessionEntity?
+    suspend fun getSessionById(id: Long): ExamSessionEntity?
 }
 
 @Singleton
@@ -47,12 +48,15 @@ class ExamRepositoryImpl @Inject constructor(
     private val examSessionDao: ExamSessionDao,
     private val userAnswerDao: UserAnswerDao
 ) : ExamRepository {
-    override suspend fun saveSession(session: ExamSessionEntity, answers: List<UserAnswerEntity>) {
-        examSessionDao.insert(session)
-        userAnswerDao.insertAll(answers)
+    override suspend fun saveSession(session: ExamSessionEntity, answers: List<UserAnswerEntity>): Long {
+        val sessionId = examSessionDao.insert(session)
+        val updatedAnswers = answers.map { it.copy(sessionId = sessionId) }
+        userAnswerDao.insertAll(updatedAnswers)
+        return sessionId
     }
     override suspend fun getAllSessions(): List<ExamSessionEntity> = examSessionDao.getAll()
     override suspend fun getLatestSession(): ExamSessionEntity? = examSessionDao.getLatest()
+    override suspend fun getSessionById(id: Long): ExamSessionEntity? = examSessionDao.getById(id)
 }
 
 interface AppStateRepository {
