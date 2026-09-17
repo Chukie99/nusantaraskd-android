@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.nusantaraskd.app-mergeDebugResources-56:/values-v16/values-v16.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\SOPIAN\\.gradle\\caches\\transforms-3\\5b8de1b9d174d83d1a112a16e7a47895\\transformed\\core-1.12.0\\res\\values-v16\\values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "65",
+                        "endOffsets": "116"
+                    }
+                }
+            ]
+        }
+    ]
+}
