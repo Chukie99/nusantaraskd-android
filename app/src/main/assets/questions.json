@@ -1,0 +1,53 @@
+[
+  {
+    "category": "TWK",
+    "subCategory": "Pancasila",
+    "questionText": "Pancasila merupakan ideologi terbuka yang mampu beradaptasi dengan perkembangan zaman namun tetap memiliki batasan. Batasan tersebut terletak pada...",
+    "optionA": "Nilai-nilai instrumentalnya",
+    "optionB": "Nilai-nilai praktisnya",
+    "optionC": "Nilai dasar yang terkandung dalam Pancasila",
+    "optionD": "Interpretasi masyarakat terhadap Pancasila",
+    "optionE": "Keputusan elit politik",
+    "weightA": 0,
+    "weightB": 0,
+    "weightC": 5,
+    "weightD": 0,
+    "weightE": 0,
+    "correctAnswer": "C",
+    "explanation": "Ideologi terbuka tidak boleh mengubah nilai dasar yang telah disepakati bersama."
+  },
+  {
+    "category": "TIU",
+    "subCategory": "Logika",
+    "questionText": "Semua mahasiswa harus mengikuti ujian. Sebagian mahasiswa membawa kartu ujian. Kesimpulannya adalah...",
+    "optionA": "Semua mahasiswa membawa kartu ujian",
+    "optionB": "Semua yang membawa kartu ujian adalah mahasiswa",
+    "optionC": "Ada mahasiswa yang mengikuti ujian tidak membawa kartu ujian",
+    "optionD": "Tidak ada mahasiswa yang membawa kartu ujian",
+    "optionE": "Semua yang tidak membawa kartu ujian bukan mahasiswa",
+    "weightA": 0,
+    "weightB": 0,
+    "weightC": 5,
+    "weightD": 0,
+    "weightE": 0,
+    "correctAnswer": "C",
+    "explanation": "Karena hanya sebagian mahasiswa yang membawa kartu ujian, maka ada sebagian lain yang tidak membawa kartu."
+  },
+  {
+    "category": "TKP",
+    "subCategory": "Profesionalisme",
+    "questionText": "Di kantor, rekan kerja Anda melakukan kesalahan yang cukup fatal dalam laporan bulanan. Atasan menanyakan siapa yang bertanggung jawab. Tindakan Anda...",
+    "optionA": "Diam saja agar hubungan dengan rekan tetap baik",
+    "optionB": "Menjelaskan kesalahan tersebut kepada atasan secara objektif tanpa menyudutkan",
+    "optionC": "Menyalahkan rekan tersebut secara terbuka di depan atasan",
+    "optionD": "Meminta rekan tersebut untuk mengaku sendiri ke atasan",
+    "optionE": "Ikut bertanggung jawab padahal bukan kesalahan Anda",
+    "weightA": 2,
+    "weightB": 5,
+    "weightC": 1,
+    "weightD": 4,
+    "weightE": 3,
+    "correctAnswer": "B",
+    "explanation": "Profesionalisme menuntut kejujuran dan objektivitas."
+  }
+]

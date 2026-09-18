@@ -25,14 +25,18 @@ class QuestionRepositoryImpl @Inject constructor(
 
     override suspend fun seedIfEmpty() {
         if (questionDao.count() == 0) {
-            val dummyQuestions = listOf(
-                QuestionEntity(category = "TWK", subCategory = "Pancasila", questionText = "Pancasila sebagai dasar negara secara resmi disahkan oleh...", optionA = "BPUPKI", optionB = "PPKI", optionC = "Panitia Sembilan", optionD = "DPR", optionE = "MPR", weightA = 0, weightB = 5, weightC = 0, weightD = 0, weightE = 0, correctAnswer = "B", explanation = "PPKI mengesahkan UUD 1945 dan Pancasila sebagai dasar negara pada 18 Agustus 1945."),
-                QuestionEntity(category = "TWK", subCategory = "UUD 1945", questionText = "Pasal 1 ayat (1) UUD 1945 menyatakan bahwa Negara Indonesia adalah negara...", optionA = "Hukum", optionB = "Demokrasi", optionC = "Kesatuan", optionD = "Republik", optionE = "Pancasila", weightA = 0, weightB = 0, weightC = 5, weightD = 0, weightE = 0, correctAnswer = "C", explanation = "Berdasarkan Pasal 1 ayat (1), Negara Indonesia adalah negara kesatuan yang berbentuk republik."),
-                QuestionEntity(category = "TWK", subCategory = "Sejarah", questionText = "Sumpah Pemuda dibacakan pada tanggal...", optionA = "20 Mei 1908", optionB = "28 Oktober 1928", optionC = "17 Agustus 1945", optionD = "1 Juni 1945", optionE = "10 November 1945", weightA = 0, weightB = 5, weightC = 0, weightD = 0, weightE = 0, correctAnswer = "B", explanation = "Kongres Pemuda II melahirkan keputusan Sumpah Pemuda pada 28 Oktober 1928."),
-                QuestionEntity(category = "TIU", subCategory = "Verbal", questionText = "Sinonim kata EKLEKTIK adalah...", optionA = "Campuran", optionB = "Murni", optionC = "Tetap", optionD = "Tunggal", optionE = "Satu", weightA = 5, weightB = 0, weightC = 0, weightD = 0, weightE = 0, correctAnswer = "A", explanation = "Eklektik berarti memilih yang terbaik dari berbagai sumber."),
-                QuestionEntity(category = "TKP", subCategory = "Pelayanan Publik", questionText = "Anda adalah seorang pegawai loket pelayanan. Seorang tamu datang dengan marah-marah karena antrean terlalu panjang. Sikap Anda...", optionA = "Memarahi balik tamu tersebut", optionB = "Mendengarkan dengan sabar dan memberikan solusi terbaik", optionC = "Mengabaikannya sampai ia tenang", optionD = "Menyuruhnya pindah ke loket lain", optionE = "Melaporkannya kepada satpam", weightA = 1, weightB = 5, weightC = 2, weightD = 3, weightE = 4, correctAnswer = "", explanation = "As a public servant, we must be patient and helpful.")
-            )
-            questionDao.insertAll(dummyQuestions)
+            val jsonString = try {
+                val inputStream = javax.inject.Inject::class.java.classLoader!!.getResourceAsStream("questions.json")
+                inputStream?.bufferedReader().use { it?.readText() }
+            } catch (e: Exception) { null }
+            
+            if (jsonString != null) {
+                val list = kotlinx.serialization.json.Json.decodeFromString<List<QuestionEntity>>(jsonString)
+                questionDao.insertAll(list)
+            } else {
+                // Fallback dummy
+                questionDao.insertAll(listOf(QuestionEntity(category = "TWK", subCategory = "Sejarah", questionText = "Dummy soal", optionA = "A", optionB = "B", optionC = "C", optionD = "D", optionE = "E", weightA = 5, weightB = 0, weightC = 0, weightD = 0, weightE = 0, correctAnswer = "A", explanation = "B")))
+            }
         }
     }
 }
