@@ -7,7 +7,3 @@ sealed class LicenseResult {
     object NoInternet : LicenseResult()
     data class Error(val message: String) : LicenseResult()
 }
-
-interface LicenseRepository {
-    suspend fun checkLicense(key: String, deviceId: String): LicenseResult
-}

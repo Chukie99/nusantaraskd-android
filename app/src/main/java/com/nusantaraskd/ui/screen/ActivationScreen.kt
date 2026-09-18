@@ -7,21 +7,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ActivationViewModel @Inject constructor(
+class LicenseValidator @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -41,7 +36,7 @@ class ActivationViewModel @Inject constructor(
                 Settings.Secure.ANDROID_ID
             ) ?: "unknown_device"
             
-            // TODO: Replace with actual license repository call when Firebase is ready
+            // TODO: Implement actual license validation with Supabase
             // For now, simulate successful activation
             val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
             prefs.edit().putBoolean("is_activated", true).apply()
@@ -61,7 +56,7 @@ sealed class ActivationState {
 @Composable
 fun ActivationScreen(
     onActivated: () -> Unit,
-    viewModel: ActivationViewModel = hiltViewModel()
+    viewModel: LicenseValidator = hiltViewModel()
 ) {
     var licenseKey by remember { mutableStateOf("") }
     val state by viewModel.uiState.collectAsState()
