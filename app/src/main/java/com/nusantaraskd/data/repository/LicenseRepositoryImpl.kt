@@ -2,7 +2,7 @@
 // Supabase logic implemented here
 package com.nusantaraskd.data.repository
 
-import com.nusantaraskd.BuildConfig
+import com.nusantaraskd.app.BuildConfig
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.serialization.Serializable

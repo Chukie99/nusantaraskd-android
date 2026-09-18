@@ -1,6 +1,6 @@
 package com.nusantaraskd.di
 
-import com.nusantaraskd.BuildConfig
+import com.nusantaraskd.app.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
