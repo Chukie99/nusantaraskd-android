@@ -17,15 +17,14 @@ android {
         versionCode = 1
         versionName = "1.0"
         
-        buildConfig = true
-        
+        // Baca URL & ANON KEY dari local.properties agar masuk ke BuildConfig
         def localProps = new Properties()
         def localFile = rootProject.file("local.properties")
         if (localFile.exists()) {
             localProps.load(new FileInputStream(localFile))
         }
-        buildConfigField "String", "SUPABASE_URL", "\"${localProps['SUPABASE_URL'] ?: ''}\""
-        buildConfigField "String", "SUPABASE_ANON_KEY", "\"${localProps['SUPABASE_ANON_KEY'] ?: ''}\""
+        buildConfigField("String", "SUPABASE_URL", "\"${localProps['SUPABASE_URL'] ?: ''}\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${localProps['SUPABASE_ANON_KEY'] ?: ''}\"")
     }
 
     compileOptions {
