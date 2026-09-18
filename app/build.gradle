@@ -23,8 +23,10 @@ android {
         if (localFile.exists()) {
             localProps.load(new FileInputStream(localFile))
         }
-        buildConfigField("String", "SUPABASE_URL", "\"${localProps['SUPABASE_URL'] ?: ''}\"")
-        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${localProps['SUPABASE_ANON_KEY'] ?: ''}\"")
+        def supabaseUrl = System.getenv("SUPABASE_URL") ?: localProps['SUPABASE_URL'] ?: "https://placeholder.supabase.co"
+        def supabaseKey = System.getenv("SUPABASE_ANON_KEY") ?: localProps['SUPABASE_ANON_KEY'] ?: "placeholder-key"
+        buildConfigField("String", "SUPABASE_URL", "\"${supabaseUrl}\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"${supabaseKey}\"")
     }
 
     compileOptions {
