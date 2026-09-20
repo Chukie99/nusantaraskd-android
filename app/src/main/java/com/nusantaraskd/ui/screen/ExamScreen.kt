@@ -1,227 +1,147 @@
 package com.nusantaraskd.ui.screen
 
-import android.util.Log
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.nusantaraskd.data.room.QuestionEntity
+import kotlinx.coroutines.delay
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExamScreen(
-    viewModel: ExamViewModel = hiltViewModel(),
-    onFinish: (Int, Int, Int, Int, Boolean) -> Unit
+    questions: List<QuestionEntity>,
+    onFinishExam: (scoreTwk: Int, scoreTiu: Int, scoreTkp: Int, userAnswers: Map<Int, String>) -> Unit
 ) {
-    val questions by viewModel.questions.collectAsState()
-    Log.d("EXAM_SCREEN", "ExamScreen composed, questions: ${questions.size}")
-    val currentIndex by viewModel.currentIndex.collectAsState()
-    val answers by viewModel.answers.collectAsState()
-    val markedQuestions by viewModel.markedQuestions.collectAsState()
-    val timeRemaining by viewModel.timeRemaining.collectAsState()
+    var timeLeftSeconds by remember { mutableStateOf(6000) } // 100 Menit
+    var currentIndex by remember { mutableStateOf(0) }
+    
+    val userAnswers = remember { mutableStateMapOf<Int, String>() }
+    // Saran #2: State untuk menandai soal ragu-ragu (flagging)
+    val flaggedQuestions = remember { mutableStateMapOf<Int, Boolean>() }
 
-    var showNavigator by remember { mutableStateOf(false) }
-
-    val currentQuestion = questions.getOrNull(currentIndex)
-    val selectedOption = answers[currentIndex] ?: ""
-    val isMarked = markedQuestions.contains(currentIndex)
-
-    val hours = timeRemaining / 3600
-    val minutes = (timeRemaining % 3600) / 60
-    val seconds = timeRemaining % 60
-    val timeFormatted = String.format("%02d:%02d:%02d", hours, minutes, seconds)
-    val isWarning = timeRemaining < 300
-
-    var submitted by remember { mutableStateOf(false) }
-
-    // Auto submit on zero
-    LaunchedEffect(timeRemaining) {
-        if (timeRemaining <= 0 && !submitted && questions.isNotEmpty()) {
-            submitted = true
-            val res = viewModel.calculateResults()
-            onFinish(res.totalScore, res.twkScore, res.tiuScore, res.tkpScore, res.passed)
+    LaunchedEffect(key1 = timeLeftSeconds) {
+        if (timeLeftSeconds > 0) {
+            delay(1000L)
+            timeLeftSeconds--
+        } else {
+            val (twk, tiu, tkp) = calculateScores(questions, userAnswers)
+            onFinishExam(twk, tiu, tkp, userAnswers)
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("${currentQuestion?.category ?: "UJIAN"} • Soal ${currentIndex + 1} / ${questions.size}") },
-                actions = {
-                    Text(
-                        timeFormatted,
-                        color = if (isWarning) Color.Red else Color.Unspecified,
-                        fontWeight = if (isWarning) FontWeight.Bold else FontWeight.Normal,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    IconButton(onClick = { showNavigator = true }) {
-                        Icon(Icons.Filled.List, contentDescription = "Navigator")
-                    }
-                }
-            )
-        }
-    ) { padding ->
-        if (questions.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        } else {
-            Column(
-                modifier = Modifier.padding(padding).padding(16.dp).fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+    val minutes = timeLeftSeconds / 60
+    val seconds = timeLeftSeconds % 60
+    val currentQuestion = questions.getOrNull(currentIndex)
+    val isFlagged = flaggedQuestions[currentIndex] == true
+
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        // Header: Timer & Indikator Ragu-ragu
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "Waktu: %02d:%02d".format(minutes, seconds), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.titleMedium)
+            
+            // Tombol Ragu-ragu (Saran #2)
+            OutlinedButton(
+                onClick = { flaggedQuestions[currentIndex] = !isFlagged },
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = if (isFlagged) Color(0xFFFFE082) else Color.Transparent
+                )
             ) {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        currentQuestion?.questionText ?: "",
-                        modifier = Modifier.padding(16.dp),
-                        fontSize = 16.sp
-                    )
-                }
+                Text(if (isFlagged) "Ragu-ragu ✓" + "" else "Tandai Ragu")
+            }
+
+            Text(text = "Soal ${currentIndex + 1} / ${questions.size}", style = MaterialTheme.typography.titleMedium)
+        }
+
+        // Body Soal
+        if (currentQuestion != null) {
+            Column(modifier = Modifier.weight(1f).padding(vertical = 16.dp)) {
+                Text(text = "[${currentQuestion.category}] ${currentQuestion.questionText}", style = MaterialTheme.typography.bodyLarge)
+                Spacer(modifier = Modifier.height(16.dp))
 
                 val options = listOf(
-                    "A" to (currentQuestion?.optionA ?: ""),
-                    "B" to (currentQuestion?.optionB ?: ""),
-                    "C" to (currentQuestion?.optionC ?: ""),
-                    "D" to (currentQuestion?.optionD ?: ""),
-                    "E" to (currentQuestion?.optionE ?: "")
+                    "A" to currentQuestion.optionA,
+                    "B" to currentQuestion.optionB,
+                    "C" to currentQuestion.optionC,
+                    "D" to currentQuestion.optionD,
+                    "E" to currentQuestion.optionE
                 )
 
-                options.forEach { (key, text) ->
-                    if (text.isNotBlank()) {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { viewModel.selectOption(key) },
-                            shape = RoundedCornerShape(8.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = if (selectedOption == key) Color(0xFFE2F0D9) else MaterialTheme.colorScheme.surface
-                            ),
-                            border = if (selectedOption == key) androidx.compose.foundation.BorderStroke(1.5.dp, Color(0xFF5C8D89)) else null
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(12.dp).fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                RadioButton(selected = (selectedOption == key), onClick = { viewModel.selectOption(key) })
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("$key. $text", fontSize = 14.sp)
-                            }
-                        }
-                    }
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Checkbox(checked = isMarked, onCheckedChange = { viewModel.toggleMark() })
-                    Text("Tandai Ragu-ragu")
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = { viewModel.prevQuestion() },
-                        enabled = currentIndex > 0,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Sebelumnya")
-                    }
-
+                options.forEach { (key, value) ->
+                    val isSelected = userAnswers[currentIndex] == key
                     Button(
-                        onClick = {
-                            if (currentIndex < questions.size - 1) {
-                                viewModel.nextQuestion()
-                            } else {
-                                val scope = CoroutineScope(Dispatchers.Main)
-                                scope.launch {
-                                    val res = viewModel.calculateResults()
-                                    onFinish(res.totalScore, res.twkScore, res.tiuScore, res.tkpScore, res.passed)
-                                }
-                            }
-                        },
-                        modifier = Modifier.weight(1f)
+                        onClick = { userAnswers[currentIndex] = key },
+                        colors = if (isSelected) ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary) 
+                                 else ButtonDefaults.outlinedButtonColors(),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
                     ) {
-                        Text(if (currentIndex < questions.size - 1) "Simpan & Lanjut" else "SELESAIKAN")
+                        Text(text = "$key. $value")
                     }
                 }
             }
         }
 
-        if (showNavigator) {
-            AlertDialog(
-                onDismissRequest = { showNavigator = false },
-                title = { Text("Navigator Soal") },
-                text = {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(5),
-                        modifier = Modifier.height(300.dp).fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(questions.size) { idx ->
-                            val isAns = answers.containsKey(idx)
-                            val isCur = idx == currentIndex
-                            val isMrk = markedQuestions.contains(idx)
+        // Footer Navigasi
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Button(
+                enabled = currentIndex > 0,
+                onClick = { if (currentIndex > 0) currentIndex-- }
+            ) {
+                Text("Sebelumnya")
+            }
 
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .background(
-                                        color = when {
-                                            isMrk -> Color(0xFFF4D06F)
-                                            isAns -> Color(0xFF5C8D89)
-                                            else -> Color.LightGray
-                                        },
-                                        shape = CircleShape
-                                    )
-                                    .border(
-                                        width = if (isCur) 2.dp else 0.dp,
-                                        color = Color.Black,
-                                        shape = CircleShape
-                                    )
-                                    .clickable {
-                                        viewModel.goToQuestion(idx)
-                                        showNavigator = false
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "${idx + 1}",
-                                    color = if (isAns || isMrk) Color.White else Color.Black,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                    }
-                },
-                confirmButton = {
-                    TextButton(onClick = { showNavigator = false }) {
-                        Text("Tutup")
+            Button(
+                onClick = {
+                    if (currentIndex < questions.size - 1) {
+                        currentIndex++
+                    } else {
+                        val (twk, tiu, tkp) = calculateScores(questions, userAnswers)
+                        onFinishExam(twk, tiu, tkp, userAnswers)
                     }
                 }
-            )
+            ) {
+                Text(if (currentIndex == questions.size - 1) "Selesai & Kumpul" else "Selanjutnya")
+            }
         }
     }
+}
+
+private fun calculateScores(questions: List<QuestionEntity>, userAnswers: Map<Int, String>): Triple<Int, Int, Int> {
+    var twk = 0
+    var tiu = 0
+    var tkp = 0
+
+    questions.forEachIndexed { index, q ->
+        val ans = userAnswers[index]
+        if (ans != null) {
+            when (q.category) {
+                "TWK" -> if (ans == q.correctAnswer) twk += 5
+                "TIU" -> if (ans == q.correctAnswer) tiu += 5
+                "TKP" -> {
+                    val weight = when (ans) {
+                        "A" -> q.weightA
+                        "B" -> q.weightB
+                        "C" -> q.weightC
+                        "D" -> q.weightD
+                        "E" -> q.weightE
+                        else -> 0
+                    }
+                    tkp += weight
+                }
+            }
+        }
+    }
+    return Triple(twk, tiu, tkp)
 }

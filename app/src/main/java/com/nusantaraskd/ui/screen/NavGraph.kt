@@ -1,16 +1,25 @@
 package com.nusantaraskd.ui.screen
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.nusantaraskd.data.room.QuestionEntity
 
 @Composable
 fun AppNavGraph() {
     val navController = rememberNavController()
+
+    // Sample / Dummy Questions (bisa diisi dari seeder/database)
+    val dummyQuestions = remember {
+        listOf(
+            QuestionEntity("1", "TWK", "Pancasila sebagai dasar negara Indonesia pertama kali dirumuskan dalam sidang...", "BPUPKI I", "BPUPKI II", "PPKI I", "PPKI II", "Proklamasi", "A", explanation = "Dirumuskan pada sidang pertama BPUPKI (29 Mei - 1 Juni 1945)."),
+            QuestionEntity("2", "TIU", "Jika A = 5 dan B = 3, maka A^2 - B^2 = ...", "16", "14", "12", "8", "4", "A", explanation = "A^2 - B^2 = 25 - 9 = 16.")
+        )
+    }
 
     NavHost(navController = navController, startDestination = "splash") {
 
@@ -61,8 +70,9 @@ fun AppNavGraph() {
 
         composable("exam") {
             ExamScreen(
-                onFinish = { score, twk, tiu, tkp, passed ->
-                    navController.navigate("result/$score/$twk/$tiu/$tkp/$passed") {
+                questions = dummyQuestions,
+                onFinishExam = { scoreTwk, scoreTiu, scoreTkp, userAnswers ->
+                    navController.navigate("summary/$scoreTwk/$scoreTiu/$scoreTkp") {
                         popUpTo("home")
                     }
                 }
@@ -70,28 +80,24 @@ fun AppNavGraph() {
         }
 
         composable(
-            "result/{score}/{twk}/{tiu}/{tkp}/{passed}",
+            "summary/{twk}/{tiu}/{tkp}",
             arguments = listOf(
-                navArgument("score") { type = NavType.IntType },
                 navArgument("twk") { type = NavType.IntType },
                 navArgument("tiu") { type = NavType.IntType },
-                navArgument("tkp") { type = NavType.IntType },
-                navArgument("passed") { type = NavType.BoolType }
+                navArgument("tkp") { type = NavType.IntType }
             )
         ) { backStackEntry ->
-            val score = backStackEntry.arguments?.getInt("score") ?: 0
             val twk = backStackEntry.arguments?.getInt("twk") ?: 0
             val tiu = backStackEntry.arguments?.getInt("tiu") ?: 0
             val tkp = backStackEntry.arguments?.getInt("tkp") ?: 0
-            val passed = backStackEntry.arguments?.getBoolean("passed") ?: false
 
-            ResultScreen(
-                score = score,
-                twk = twk,
-                tiu = tiu,
-                tkp = tkp,
-                passed = passed,
-                onHome = {
+            ExamSummaryScreen(
+                scoreTwk = twk,
+                scoreTiu = tiu,
+                scoreTkp = tkp,
+                questions = dummyQuestions,
+                userAnswers = emptyMap(),
+                onBackHome = {
                     navController.navigate("home") {
                         popUpTo("home") { inclusive = true }
                     }
