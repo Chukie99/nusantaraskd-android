@@ -26,7 +26,8 @@ class QuestionRepositoryImpl @Inject constructor(
     override suspend fun seedIfEmpty() {
         if (questionDao.count() == 0) {
             val jsonString = try {
-                val inputStream = javax.inject.Inject::class.java.classLoader!!.getResourceAsStream("questions.json")
+                val inputStream = javax.inject.Inject::class.java.classLoader!!.getResourceAsStream("questions_bank_1100.json")
+                    ?: javax.inject.Inject::class.java.classLoader!!.getResourceAsStream("questions.json")
                 inputStream?.bufferedReader().use { it?.readText() }
             } catch (e: Exception) { null }
             
