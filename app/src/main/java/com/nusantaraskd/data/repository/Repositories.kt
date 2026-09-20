@@ -26,16 +26,21 @@ class QuestionRepositoryImpl @Inject constructor(
     override suspend fun seedIfEmpty() {
         if (questionDao.count() == 0) {
             val jsonString = try {
-                val inputStream = javax.inject.Inject::class.java.classLoader!!.getResourceAsStream("questions_bank_1100.json")
-                    ?: javax.inject.Inject::class.java.classLoader!!.getResourceAsStream("questions.json")
-                inputStream?.bufferedReader().use { it?.readText() }
-            } catch (e: Exception) { null }
+                val context = com.nusantaraskd.app.MainApplication.getAppContext()
+                val inputStream = context.assets.open("questions_bank_1100.json")
+                inputStream.bufferedReader().use { it.readText() }
+            } catch (e: Exception) {
+                try {
+                    val context = com.nusantaraskd.app.MainApplication.getAppContext()
+                    val inputStream = context.assets.open("questions.json")
+                    inputStream.bufferedReader().use { it.readText() }
+                } catch (e2: Exception) { null }
+            }
             
             if (jsonString != null) {
-                val list = kotlinx.serialization.json.Json.decodeFromString<List<QuestionEntity>>(jsonString)
+                val list = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }.decodeFromString<List<QuestionEntity>>(jsonString)
                 questionDao.insertAll(list)
             } else {
-                // Fallback dummy
                 questionDao.insertAll(listOf(QuestionEntity(category = "TWK", subCategory = "Sejarah", questionText = "Dummy soal", optionA = "A", optionB = "B", optionC = "C", optionD = "D", optionE = "E", weightA = 5, weightB = 0, weightC = 0, weightD = 0, weightE = 0, correctAnswer = "A", explanation = "B")))
             }
         }
