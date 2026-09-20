@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "questions")
+@kotlinx.serialization.Serializable
 data class QuestionEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val category: String, // TWK, TIU, TKP
