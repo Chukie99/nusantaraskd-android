@@ -7,7 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.nusantaraskd.data.room.QuestionEntity
+import com.nusantaraskd.data.local.entity.QuestionEntity
 
 @Composable
 fun QuestionReviewScreen(
