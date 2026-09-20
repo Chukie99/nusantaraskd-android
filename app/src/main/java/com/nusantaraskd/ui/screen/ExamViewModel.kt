@@ -48,7 +48,12 @@ class ExamViewModel @Inject constructor(
     private fun loadQuestions() {
         viewModelScope.launch {
             questionRepository.seedIfEmpty()
-            _questions.value = questionRepository.getAllQuestions()
+            val allQuestions = questionRepository.getAllQuestions()
+            val twk = allQuestions.filter { it.category.equals("TWK", ignoreCase = true) }.shuffled().take(30)
+            val tiu = allQuestions.filter { it.category.equals("TIU", ignoreCase = true) }.shuffled().take(35)
+            val tkp = allQuestions.filter { it.category.equals("TKP", ignoreCase = true) }.shuffled().take(45)
+            
+            _questions.value = (twk + tiu + tkp).shuffled()
         }
     }
 
@@ -128,7 +133,7 @@ class ExamViewModel @Inject constructor(
             userAnswerEntities.add(
                 UserAnswerEntity(
                     sessionId = 0,
-                    questionId = q.id,
+                    jsonId = q.id,
                     selectedOption = selected,
                     isCorrect = isCorrect,
                     timeTaken = 0
